@@ -1,2 +1,2 @@
-# LinearRegression
-Linear Regression Analysis by R Program
+# Biostatistics
+ by R Program
