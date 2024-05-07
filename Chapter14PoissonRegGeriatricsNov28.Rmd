@@ -1,0 +1,124 @@
+---
+title: "Chapter 14: Poisson Regression Model"
+author: "Tanweer Shapla"
+date: "11/28/2022"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment="", message=F, warning=F)
+```
+
+
+## Example: Geriatric study 
+A researcher in geriatrics designed a prospective study to investigate the effects of two interventions on the frequency of falls. One hundred subjects were randomly assigned to one of the two interventions: education only $(X_1=0)$ and education plus aerobic exercise training $(X_1=1)$. Subjects were at least $65$ years of age and in reasonably good health. 
+ 
+Three variables considered to be important as control variables were gender $(X_2:0=female; 1=male)$,  a balance index $(X_3)$, and a strength index $(X_4)$. The higher the balance index, the more stable the subject, and the higher the strength index, the stronger is the subject. Each subject kept a diary recording the number of falls $(Y)$ during the six months of the study. We wish to model the number of falls on type of interventions, gender, balance index and strength index.  
+
+The data 'GeriaticStudy' is available in Canvas. The columns represent the following variables in order from left to right:
+
+Number of falls, type of intervention, gender of the participant, balance index and strength index.
+
+a. Write down the equation of the Poisson regression model that can be used to estimate the number of falls for given values of the predictor variables. 
+
+
+b. To fit a Poisson regression model, find the maximum likelihood estimates of $\beta_0$, $\beta_1$, $\beta_2$ and $\beta_3$. Write down the fitted response function. 
+
+
+c. Obtain $e^{b_1}, e^{b_2}$ , $e^{b_3}$ and $e^{b_4}$. Interpret these numbers in the context. 
+
+
+## Solution
+
+**Part a**
+
+The equation of the Poisson regression model is 
+
+$log(\mu_i)=\beta_0+\beta_1X_1+\beta_2X_2+\beta_3X_3+\beta_4X_4$
+
+Or, we can write
+
+$\mu_i=e^(\beta_0+\beta_1X_1+\beta_2X_2+\beta_3X_3+\beta_4X_4)$
+
+In order to solve parts b and c, we import the data. Since the original data does not have variables labeled, we assign names to the variables.
+
+## Reading the data
+
+```{r echo=T, comment=""}
+setwd("C:/Users/tshapla/Desktop/COURSES/Stat 461_575/R Materials")
+GS<-read.table("GeriaticStudy.txt")
+colnames(GS)<-c("Fall", "Intervention", "Gender", "Balance", "Strength")
+head(GS,3)
+tail(GS, 3)
+```
+
+
+## Renaming the levels of factors
+
+Below we change the level names for Gender ("Female" for 0, "Male" for 1) and Intervention ("EduOnly" for 0, "EduTrain" for 1).
+
+```{r}
+GS$Gender<-as.factor(GS$Gender)
+levels(GS$Gender) = c("Female", "Male")
+
+GS$Intervention<-as.factor(GS$Intervention)
+levels(GS$Intervention)=c("EduOnly", "EduTrain")
+
+head(GS,3)
+tail(GS, 3)
+```
+
+
+## Fitting Poisson Regression Model
+```{r echo=T, comment=""}
+model.GS<-glm(Fall~Intervention+Gender+Balance+Strength, data=GS, family = poisson(link="log"))
+summary(model.GS)
+
+
+b<-model.GS$coefficients
+b
+```
+
+**Part (b)**
+
+The fitted Poisson regression model is 
+
+$log(\mu_i)=0.489467165-1.069402551X_1-0.046606063 X_2+0.009469987X_3+0.008565829 X_4$.
+
+Or, 
+
+$\mu_i=e^(0.489467165-1.069402551X_1-0.046606063 X_2+0.009469987X_3+0.008565829 X_4)$
+
+
+**Part (c) **
+
+```{r}
+exp.b<-round(exp(b), digits=4)
+exp.b
+```
+
+
+**Interpretation of $e^{b_1}$** :
+
+We find $e^{b_1}=0.3432$. This means that the expected number of falls increases over 0.3432-fold for the 'education plus aerobic exercise training' group compared to only education group when all other predictor variables remain fixed. In other words, the expected number of falls for the 'education plus aerobic exercise training' group is $(100-34)\%=66\%$ less than the only education group when all other predictor variables remain fixed. 
+
+
+
+**Interpretation of $e^{b_2}$** :
+
+We find $e^{b_2}=0.9545$. This means that the expected number of falls increases over 0.9545-fold for the Male compared with Female when all other predictor variables remain fixed. In other words, the expected number of falls for the Male participants is $(100-95)\%=5\%$ less than the female participants keeping other predictors at the same level. 
+
+
+
+**Interpretation of $e^{b_3}$** :
+
+We find $e^{b_3}=1.0095$. This means that the expected number of falls increases over 1.0095-fold for every one unit increase in the value of the balance index when all other predictor variables remain fixed. In other words, the expected number of falls remains almost unchanged for every one unit increase in the balance index keeping other predictors at the same level. 
+
+**Interpretation of $e^{b_4}$** :
+
+We find $e^{b_4}=1.0086$. This means that the expected number of falls increases over 1.0086-fold for every one unit increase in the value of the strength index when all other predictor variables remain fixed. In other words, the expected number of falls remains almost unchanged for every one unit increase in the strength index keeping other predictors at the same level. 
+
+
+
+
+
